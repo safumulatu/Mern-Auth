@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
 const SignUp = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -28,7 +29,7 @@ const SignUp = () => {
         setError(true);
         return;
       }
-      setError(false);
+      navigate("/login");
     } catch (error) {
       setLoading(false);
       setError(true);
@@ -36,7 +37,7 @@ const SignUp = () => {
   };
   return (
     <div>
-      <h1 className="text-3xl text-center font-sans font-bold">signup</h1>
+      <h1 className="text-3xl text-center font-sans font-bold m-8">sign up</h1>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 max-w-lg mx-auto"

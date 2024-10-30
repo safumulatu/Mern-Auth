@@ -1,37 +1,58 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const errorHandler = require("../utils/error.handler");
 
-const signup = async (req, res) => {
+const signup = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
-    //! hashing the password
-    const hashedPassword = bcrypt.hashSync(password, 10);
 
-    //! Check if any of the required fields are missing
+    // Validate input
     if (!username || !email || !password) {
-      return res
-        .status(400)
-        .json({ message: "please fill all the required information." });
+      const error = new Error("Username, email, and password are required.");
+      error.statusCode = 400;
+      return next(error); // Pass the error to the error handler
     }
 
-    //! Example: Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists." });
+      return next(errorHandler(400, "user already exist!"));
     }
-    // // check if password length is less than 8 character
-    // if (password.length < 8) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "password character must be greater or equal to 8" });
-    // }
-    //! Example: Create the new user
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ username, email, password: hashedPassword });
     await newUser.save();
+
     return res.status(201).json({ message: "User created successfully." });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal server error." });
+    return next(errorHandler(400, "something went wrong while creating user!"));
   }
 };
-module.exports = { signup };
+
+//!login controllers
+const Signin = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    //! is exist user is
+    const existUser = await User.findOne({ email });
+    if (!existUser) {
+      return next(errorHandler(400, "user not found!"));
+    }
+    //! comparing hashed password
+    const isPasswordMatch = bcrypt.compareSync(password, existUser.password);
+    if (!isPasswordMatch) {
+      return next(errorHandler(400, "invalid login credentials!"));
+    }
+    //! generate the token
+    const token = jwt.sign({ id: existUser._id }, "process.env.JWT_SECRET_KEY");
+    return res.json({
+      message: "log in success1",
+      user: existUser,
+      tokon: token,
+    });
+  } catch (error) {
+    return next(errorHandler(500, "something went wrong while sign in"));
+  }
+};
+module.exports = { signup, Signin };

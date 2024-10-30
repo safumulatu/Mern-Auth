@@ -35,22 +35,27 @@ const Signin = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     //! is exist user is
-    const existUser = await User.findOne({ email });
-    if (!existUser) {
+    const validUser = await User.findOne({ email });
+    if (!validUser) {
       return next(errorHandler(400, "user not found!"));
     }
     //! comparing hashed password
-    const isPasswordMatch = bcrypt.compareSync(password, existUser.password);
-    if (!isPasswordMatch) {
-      return next(errorHandler(400, "invalid login credentials!"));
+    const validPassword = bcrypt.compareSync(password, validUser.password);
+    if (!validPassword) {
+      return next(errorHandler(401, "invalid login credentials!"));
     }
     //! generate the token
-    const token = jwt.sign({ id: existUser._id }, "process.env.JWT_SECRET_KEY");
-    return res.json({
-      message: "log in success1",
-      user: existUser,
-      tokon: token,
-    });
+    const token = jwt.sign({ id: validUser._id }, "process.env.JWT_SECRET_KEY");
+    const { password: hashedPassword, ...rest } = validUser._doc;
+    const expiryDate = new Date(Date.now() + 3600000);
+    return res
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        expires: expiryDate,
+      })
+      .status(200)
+      .json(rest);
   } catch (error) {
     return next(errorHandler(500, "something went wrong while sign in"));
   }

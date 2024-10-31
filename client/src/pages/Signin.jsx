@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInStart, signInSuccess, signInFailure } from "../redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
+import OAuth from "../components/OAuth";
 
 const Signin = () => {
   const dispatch = useDispatch();
@@ -16,7 +17,7 @@ const Signin = () => {
     e.preventDefault();
     try {
       dispatch(signInStart());
-      const res = await fetch("http://localhost:3000/api/user/signin", {
+      const res = await fetch("http://localhost:3000/api/auth/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,6 +62,7 @@ const Signin = () => {
         >
           {loading ? "loading please wait..." : "sign in"}
         </button>
+        <OAuth />
       </form>
       <div className="flex gap-2 justify-center mt-5">
         <p className="font-bold text-xl">dont have an accout?</p>

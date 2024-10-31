@@ -66,7 +66,7 @@ const SignUp = () => {
         />
         <button
           disabled={loading}
-          className="bg-slate-700 p-3 text-white rounded-lg uppercase w-1/2 mx-32 hover:opacity-90 disabled:opacity-75"
+          className="bg-slate-700 p-3 text-white rounded-lg uppercase w-1/2 mx-auto hover:opacity-90 disabled:opacity-75"
         >
           {loading ? "loading please wait..." : "sign up"}
         </button>

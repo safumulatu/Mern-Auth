@@ -58,7 +58,7 @@ const Signin = () => {
         />
         <button
           disabled={loading}
-          className="bg-slate-700 p-3 text-white rounded-lg uppercase w-1/2 mx-32 hover:opacity-90 disabled:opacity-75"
+          className="bg-slate-700 p-3 text-white rounded-lg uppercase w-1/2 hover:opacity-90 disabled:opacity-75 mx-auto"
         >
           {loading ? "loading please wait..." : "sign in"}
         </button>
